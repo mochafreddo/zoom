@@ -19,11 +19,11 @@ socket.addEventListener('close', () => {
 });
 
 // Form Handling
-function handleSubmit(event) {
+const handleSubmit = (event) => {
   event.preventDefault();
   const input = messageForm.querySelector('input');
   socket.send(input.value);
   input.value = '';
-}
+};
 
 messageForm.addEventListener('submit', handleSubmit);
