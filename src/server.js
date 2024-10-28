@@ -17,8 +17,19 @@ app.get('/', (_, res) => res.render('home'));
 app.get('/*', (_, res) => res.redirect('/'));
 
 // WebSocket handling
-const handleConnectino = (socket) => console.log(socket);
-wss.on('connection', handleConnectino);
+wss.on('connection', (socket) => {
+  console.log('Connected to Browser ✅');
+
+  socket.send('hello!!!');
+
+  socket.on('message', (message) => {
+    console.log(message);
+  });
+
+  socket.on('close', () => {
+    console.log('Disconnected from the Browser ❌');
+  });
+});
 
 // Server initialization
 const handleListen = () => console.log(`Listening on http://localhost:3000`);
