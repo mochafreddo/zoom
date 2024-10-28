@@ -2,10 +2,11 @@ import express from 'express';
 import http from 'http';
 import WebSocket from 'ws';
 
-// Express initialization
+// Server initialization
 const app = express();
 const server = http.createServer(app);
 const wss = new WebSocket.Server({ server });
+const sockets = [];
 
 // Express configuration
 app.set('view engine', 'pug');
@@ -18,19 +19,21 @@ app.get('/*', (_, res) => res.redirect('/'));
 
 // WebSocket handling
 wss.on('connection', (socket) => {
+  sockets.push(socket);
   console.log('Connected to Browser ✅');
 
-  socket.send('hello!!!');
-
-  socket.on('message', (message) => {
-    console.log(message);
+  socket.on('close', () => {
+    // Remove disconnected socket from array
+    const index = sockets.indexOf(socket);
+    if (index > -1) sockets.splice(index, 1);
+    console.log('Disconnected from the Browser ❌');
   });
 
-  socket.on('close', () => {
-    console.log('Disconnected from the Browser ❌');
+  socket.on('message', (message) => {
+    sockets.forEach((aSocket) => aSocket.send(message.toString()));
   });
 });
 
-// Server initialization
-const handleListen = () => console.log(`Listening on http://localhost:3000`);
-server.listen(3000, handleListen);
+// Start server
+const PORT = 3000;
+server.listen(PORT, () => console.log(`Listening on http://localhost:${PORT}`));

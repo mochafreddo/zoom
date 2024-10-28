@@ -1,20 +1,29 @@
+// DOM Elements
+const messageList = document.querySelector('ul');
+const messageForm = document.querySelector('form');
+
+// WebSocket Setup
 const socket = new WebSocket(`ws://${window.location.host}`);
 
-// Connection event handlers
+// WebSocket Event Handlers
 socket.addEventListener('open', () => {
   console.log('Connected to Server ✅');
+});
+
+socket.addEventListener('message', (message) => {
+  console.log('New message: ', message.data);
 });
 
 socket.addEventListener('close', () => {
   console.log('Disconnected from Server ❌');
 });
 
-// Message handling
-socket.addEventListener('message', (message) => {
-  console.log('New message: ', message.data);
-});
+// Form Handling
+function handleSubmit(event) {
+  event.preventDefault();
+  const input = messageForm.querySelector('input');
+  socket.send(input.value);
+  input.value = '';
+}
 
-// Test message
-setTimeout(() => {
-  socket.send('hello from the browser!');
-}, 10000);
+messageForm.addEventListener('submit', handleSubmit);
